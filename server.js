@@ -8,10 +8,10 @@ require('dotenv').config();
 const DB_URL = process.env.DB_URL;
 const PORT = process.env.PORT || 5000;
 
-// 1️⃣ Crear servidor HTTP
+// Crear servidor HTTP
 const server = http.createServer(app);
 
-// 2️⃣ Configurar Socket.IO con CORS compatible con apps móviles
+// Configurar Socket.IO con CORS compatible
 const io = new Server(server, {
   cors: {
     origin: [
@@ -28,7 +28,7 @@ const io = new Server(server, {
   }
 });
 
-// 3️⃣ Conexiones de Socket.IO
+// Conexiones de Socket.IO
 io.on('connection', (socket) => {
   console.log('⚡ Cliente conectado:', socket.id);
 
@@ -37,16 +37,14 @@ io.on('connection', (socket) => {
   });
 });
 
-// 4️⃣ Rutas que dependen del socket
+// Rutas que dependen del socket
 const notificacionesRoutes = require('./app/routes/notificacionesRoutes')(io);
 app.use('/api/notificaciones', notificacionesRoutes);
 
-// 5️⃣ Conectar a MongoDB y levantar servidor
+// Conectar a MongoDB y levantar servidor
 mongoose.connect(DB_URL)
   .then(() => {
     console.log('✅ Conectado a MongoDB');
-
-    // Servidor Express (API + app)
     server.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 Servidor corriendo en http://0.0.0.0:${PORT}`);
     });

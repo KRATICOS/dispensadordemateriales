@@ -7,7 +7,7 @@ const morgan = require('morgan');
 
 const app = express();
 
-// Lista de orígenes permitidos (incluye móviles e Ionic)
+// Lista de orígenes permitidos (web + apps móviles)
 const allowedOrigins = [
   'capacitor://localhost',
   'capacitor://127.0.0.1',
@@ -15,13 +15,12 @@ const allowedOrigins = [
   'http://localhost',
   'http://localhost:8100',
   'https://frontend-oficial.onrender.com',
-  null // ← Permite peticiones sin origen (común en apps móviles)
+  null // permite requests sin origen (apps móviles)
 ];
 
 // Configuración CORS
 const corsOptions = {
   origin: function (origin, callback) {
-    console.log('CORS Origin:', origin);
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -30,12 +29,10 @@ const corsOptions = {
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  preflightContinue: false,
-  optionsSuccessStatus: 204
+  allowedHeaders: ['Content-Type', 'Authorization']
 };
 
-// Middlewares de seguridad y registro
+// Middlewares de seguridad y logging
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(cors(corsOptions));
@@ -45,8 +42,8 @@ app.options('*', cors(corsOptions));
 app.use(bodyParser.json({ limit: '20mb' }));
 app.use(bodyParser.urlencoded({ limit: '20mb', extended: true }));
 
-// Archivos estáticos (imágenes, etc.)
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Archivos estáticos (imágenes)
+app.use('/uploads', cors(corsOptions), express.static(path.join(__dirname, 'uploads')));
 
 // Rutas
 const authRoutes = require('./app/routes/authRoutes');
@@ -57,7 +54,7 @@ const inventarioRoutes = require('./app/routes/inventarioRoutes');
 const uploadRoutes = require('./app/routes/uploadRoutes');
 const categoriaRoutes = require('./app/routes/categoriaRoutes');
 
-// Asignación de rutas con prefijo /api
+// Prefijo /api
 app.use('/api', uploadRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/usuarios', usuarioRoutes);
