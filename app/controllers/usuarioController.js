@@ -2,9 +2,6 @@ const Usuario = require('../models/usuario');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-// URL pública de tu backend en Render
-const BASE_URL = process.env.BACKEND_URL || 'https://mdbackend-ys7z.onrender.com';
-
 // Obtener todos los usuarios
 exports.getUsers = async (req, res) => {
     try {
@@ -31,7 +28,7 @@ exports.getUserById = async (req, res) => {
 exports.createUser = async (req, res) => {
     try {
         const { name, email, password, tel, rol, matricula, grupo } = req.body;
-        const files = req.files || [];
+        const files = req.files;
 
         const userExists = await Usuario.findOne({ email });
         if (userExists) {
@@ -39,7 +36,7 @@ exports.createUser = async (req, res) => {
         }
 
         const imagenes = files.map(file => ({
-            url: `${BASE_URL}/uploads/${encodeURIComponent(file.filename)}`
+            url: `https://mdbackend-ys7z.onrender.com/api/uploads/${file.filename}`
         }));
 
         const newUser = new Usuario({
@@ -76,7 +73,7 @@ exports.updateUser = async (req, res) => {
 
         if (req.files && req.files.length > 0) {
             const imagenes = req.files.map(file => ({
-                url: `${BASE_URL}/uploads/${encodeURIComponent(file.filename)}`
+                url: `https://mdbackend-ys7z.onrender.com/api/uploads/${file.filename}`
             }));
             fieldsToUpdate.imagenes = imagenes;
         }
@@ -87,7 +84,9 @@ exports.updateUser = async (req, res) => {
             { new: true, runValidators: true }
         ).select('-password');
 
-        if (!user) return res.status(404).json({ message: 'Usuario no encontrado' });
+        if (!user) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
 
         res.json({ message: 'Usuario actualizado correctamente', user });
     } catch (error) {
@@ -121,7 +120,9 @@ exports.createUsersMasivo = async (req, res) => {
                 const { name, email, password, tel, rol, matricula, grupo } = user;
 
                 const yaExiste = await Usuario.findOne({ email });
-                if (yaExiste) return { email, error: 'El correo ya está registrado' };
+                if (yaExiste) {
+                    return { email, error: 'El correo ya está registrado' };
+                }
 
                 const nuevoUsuario = new Usuario({
                     name,

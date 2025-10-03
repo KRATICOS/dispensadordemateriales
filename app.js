@@ -38,12 +38,10 @@ app.use(morgan('dev'));
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
-// Body parser
 app.use(bodyParser.json({ limit: '20mb' }));
 app.use(bodyParser.urlencoded({ limit: '20mb', extended: true }));
-
-// Archivos estáticos (imágenes)
 app.use('/uploads', cors(corsOptions), express.static(path.join(__dirname, 'uploads')));
+
 
 // Rutas
 const authRoutes = require('./app/routes/authRoutes');
@@ -52,20 +50,17 @@ const itemsRoutes = require('./app/routes/items');
 const historialRoutes = require('./app/routes/historialRoutes');
 const inventarioRoutes = require('./app/routes/inventarioRoutes');
 const uploadRoutes = require('./app/routes/uploadRoutes');
-const categoriaRoutes = require('./app/routes/categoriaRoutes');
+const categoriaRoutes = require('./app/routes/categoriaRoutes'); // ← ✅ NUEVO
 
-// Prefijo /api
 app.use('/api', uploadRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/usuarios', usuarioRoutes);
 app.use('/api/items', itemsRoutes);
 app.use('/api/inventario', inventarioRoutes);
 app.use('/api/historial', historialRoutes);
-app.use('/api/categorias', categoriaRoutes);
-
+app.use('/api/categorias', categoriaRoutes); // ← ✅ NUEVO
 // Ruta base de prueba
 app.get('/', (req, res) => {
   res.json({ message: 'API de Materials-Dispenser funcionando correctamente.' });
 });
-
 module.exports = app;
